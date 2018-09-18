@@ -15,11 +15,13 @@ class IRegister {
      * @description añade namespace de las clase a incluir
      * @param string $dir directorio base
      * @param array $ns registro de namespace
+     * @return $this
      */
     public function add($dir, array $ns)
     {
         $this->base_dir = $dir;
         $this->namespace = array_merge($this->namespace, $ns);
+        return $this;
     }
     
     /**
@@ -34,7 +36,7 @@ class IRegister {
     {
         $rp = ['/', '\\'];
         foreach($this->namespace as $ns => $dir) {
-            if (strpos($name, $ns)!==false){
+            if (strpos($name, $ns)!==false||$name===$ns){
                 $path = str_replace($ns, $dir, $name);
                 return $this->absPath($rp, $path);
             } 
