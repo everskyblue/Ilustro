@@ -85,7 +85,7 @@ class IBootloader {
                 }
             }
         } else {
-            //throw new \Exception("class {$file} not fount");
+            throw new \Exception("class {$cl_name} not fount");
         }
     }
 }
