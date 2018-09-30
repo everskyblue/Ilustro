@@ -15,7 +15,7 @@ class TreeElement extends MagicTags implements CallerInterface {
     /**
      * @var string
      */
-    protected $name_node;
+    protected $node_name;
 
     /**
      * @var array
@@ -77,12 +77,42 @@ class TreeElement extends MagicTags implements CallerInterface {
     }
 
     /**
+     * @return array
+     */
+    public function getNodeGen()
+    {
+        return $this->insert_node;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetNodeGen()
+    {
+        $this->insert_node = [];
+        return $this;
+    }
+
+    /**
      * return $this
      */
     public function insideAll()
     {
-        $this->node[count($this->node) - 1]['body'] = $this->insert_node;
+        $this->insertChild($this->insert_node);
         $this->insert_node = [];
+        return $this;
+    }
+
+    /**
+     * @param array | TreeElement $child
+     * @return $this
+     */
+    public function insertChild($child)
+    {
+        $this->node[count($this->node) - 1]['body'] = array_merge(
+            $this->node[count($this->node) - 1]['body'],
+            ($child instanceof TreeElement ? $child->getNode() : $child)
+        );
         return $this;
     }
 
