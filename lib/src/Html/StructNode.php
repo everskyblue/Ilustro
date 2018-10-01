@@ -16,7 +16,7 @@ trait StructNode {
         return [
             'nodeName' => $t,
             'attr' => $a,
-            'close' => true,
+            'close' => Tag::CLOSE,
             'body' => []
         ];
     }

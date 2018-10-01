@@ -55,12 +55,13 @@ class InsertChildNode extends MagicTags implements CallerInterface {
 
     /**
      * @param string $t
-     * @param string $a
+     * @param string|null $a
+     * @return AppendNode
      */
-    public function append($t, $a)
+    public function append($t, $a = null)
     {
-        Tag::append($t, $a)->push(
-            $this->recursive(array_shift($this->insert), $this->insert)
+        return Tag::append($t, $a, $this->he)->push(
+            [$this->recursive(array_shift($this->insert), $this->insert)]
         );
     }
 }

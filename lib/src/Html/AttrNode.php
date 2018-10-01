@@ -3,9 +3,8 @@
 namespace Kowo\Ilustro\Html;
 
 
-
 /**
- * @package Html
+ * @package Kowo\Ilustro\Html
  */
 final class AttrNode {
     /**
@@ -31,6 +30,16 @@ final class AttrNode {
     public function set($key, $val)
     {
         $this->attr[$key] = $val;
+    }
+
+    /**
+     * @param string $k
+     * @param string $v
+     * @return bool
+     */
+    public function compare($k, $v)
+    {
+        return isset($this->attr[$k]) && in_array($v, explode(' ', $this->attr[$k]));
     }
 
     /**

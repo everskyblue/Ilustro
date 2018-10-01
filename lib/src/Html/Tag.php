@@ -15,12 +15,12 @@ class Tag {
     /**
      * @var const CLOSE
      */
-    const CLOSE = false;
+    const CLOSE = true;
 
     /**
      * @var const NOT_CLOSE
      */
-    const NOT_CLOSE = true;
+    const NOT_CLOSE = false;
 
     /**
      * @var TreeElement
@@ -38,10 +38,10 @@ class Tag {
 
     /**
      * @param string $t
-     * @param string $a
+     * @param string|null $a
      * @return AppendNode
      */
-    public static function append($t, $a, TreeElement $to = null)
+    public static function append($t, $a = nul, TreeElement $to = null)
     {
         return new AppendNode($to ?: self::$e, $t, $a);
     }
