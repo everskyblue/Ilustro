@@ -3,7 +3,7 @@
 namespace Kowo\Ilustro\Http\Request;
 
 trait CheckMethod {
-    
+
     /**
      * obtiene el nombre del metodo del input hidden
      *
@@ -21,7 +21,7 @@ trait CheckMethod {
      * @param string $s
      * @return bool
      */
-    protected function compare($s)
+    public function compareMethod($s)
     {
         $c = $this->getInputMethod() ?: $this->getMethod();
         if (in_array($c, explode(',', $s))) {

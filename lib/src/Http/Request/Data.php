@@ -1,8 +1,8 @@
 <?php
 
-namespace Kowo\Ilustro\Request\Http;
+namespace Kowo\Ilustro\Http\Request;
 
-trait DataServer
+trait Data
 {
     /**
      * @var array añade los parametros de la cookie
@@ -149,7 +149,7 @@ trait DataServer
     {
         return $_POST;
     }
-    
+
     /**
      * @access public
      * @param string $key
@@ -160,7 +160,7 @@ trait DataServer
         $post = $this->getPostParams();
         return isset($post[$key]) ? $post[$key] : null;
     }
-    
+
     /**
      * obtien el path de la url removiendo el script que se esta ejecutando
      *
@@ -291,7 +291,7 @@ trait DataServer
     {
         return $this->getHeader('HTTPS') ? true : false;
     }
-    
+
     /**
      * @return bool
      */
@@ -299,7 +299,7 @@ trait DataServer
     {
         return ($this->getHeader('X_REQUESTED_WITH') == 'XMLHttpRequest');
     }
-    
+
     /**
      * @access protected
      * @param string $key
