@@ -116,7 +116,7 @@ class Capsule implements \ArrayAccess, \Countable {
         $reflection = new \ReflectionClass($cl);
 
         foreach ($params as $i  => $k) {
-            $params[$i] = $this->$k;
+            $params[$i] = $k == 'capsule' ? $this : $this->$k;
         }
 
         return $reflection->newInstanceArgs($params);

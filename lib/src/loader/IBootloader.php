@@ -1,7 +1,8 @@
 <?php
-include "IRegister.php";
 
-define("PEWE_DIR", dirname(__FILE__, 2));
+define("PEWE_DIR", dirname(dirname(__FILE__)));
+
+include "IRegister.php";
 
 $fr = __DIR__ . DIRECTORY_SEPARATOR . "register.json";
 
@@ -14,34 +15,34 @@ if (!file_exists($fr)) {
  * @package IBootloader
  **/
 class IBootloader {
-    
+
     /**
      * @var IRegister
      */
     private static $ns;
-    
+
     /**
      * @var array registro de archivos cargados
      */
     private static $register = [],
-    
+
     /**
      * @var array añade los archivos incluidos
      */
     $included = [];
-    
+
     /**
      * @access private
      */
     private static function readRegister()
     {
         global $fr;
-        
+
         if (file_exists($fr)) {
-            self::$register = json_decode(file_get_contents($fr), true);
+            //self::$register = json_decode(file_get_contents($fr), true);
         }
     }
-    
+
     /**
      * @param string $file
      */
@@ -54,7 +55,7 @@ class IBootloader {
         fwrite($h, $content);
         fclose($h);
     }
-    
+
     /**
      * @param IRegister $ns
      */
@@ -64,7 +65,7 @@ class IBootloader {
         self::readRegister();
         spl_autoload_register(__CLASS__. '::pipe');
     }
-    
+
     /**
      * @param string $cl nombre de la clase
      */
@@ -72,12 +73,12 @@ class IBootloader {
     {
         $pl = explode("\\", $cl);
         $cl_name = array_pop($pl);
-        $path = realpath((self::$ns->{join("\\", $pl)}));
+        $path = dirname(self::$ns->resolvePath($cl));
         $file = $path . DIRECTORY_SEPARATOR . $cl_name . ".php";
+        set_include_path($path);
         if (is_file($file)) {
-            if (!in_array($file, self::$register)) {
+            if (!in_array($file, self::$register))
                 self::appendRegister($file);
-            } 
             foreach(self::$register as $f) {
                 if (!in_array($f, self::$included)){
                     array_push(self::$included, $f);
@@ -85,7 +86,7 @@ class IBootloader {
                 }
             }
         } else {
-            throw new \Exception("class {$cl_name} not fount");
+            throw new \Exception("class {$cl_name} {$file} not fount");
         }
     }
 }

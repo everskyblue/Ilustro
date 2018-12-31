@@ -160,7 +160,7 @@ trait MistakeRenderTrait {
      */
     protected function createSourceContent($file, $errline)
     {
-        $text = file_get_contents($file);
+        $text = join("", array_filter(preg_split("/[\r]/", file_get_contents($file))));
 
         $source_content = Tag::div(['class' => 'source-container'])
             ->insertChild(Tag::div($file.':'.$errline, ['class' => 'file-error']));

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Handler;
+namespace Kowo\Ilustro\Handler\Route;
 
 
 class Route {
@@ -8,7 +8,7 @@ class Route {
     /**
      * @var string
      */
-    protected $namespace_controller = 'App\Http\Controller';
+    protected $namespace_controller = 'App\Controllers\\';
 
     /**
      * @string rgxParams
@@ -210,7 +210,7 @@ class Route {
         list($nameclass, $method) = explode('@', $str, 2);
 
         $nameclass = $this->namespace_controller . $nameclass;
-
+        
         $reflection = new \ReflectionClass($nameclass);
 
         if(!$reflection->isInstantiable()){

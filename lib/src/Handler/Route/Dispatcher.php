@@ -29,6 +29,11 @@ class Dispatcher
      * @var ComponentUrl
      */
     protected $url;
+    
+    /**
+     * @var Kowo\Ilustro\Wrapper\Capsule
+     */
+    protected $container;
 
     /**
      * Dispatcher constructor.
@@ -36,14 +41,15 @@ class Dispatcher
      * @param Kowo\Ilustro\Http\Request $request
      * @param Kowo\Ilustro\Http\Response $response
      */
-    public function __construct($route, Request $request, Response $response)
+    public function __construct($container)
     {
-        $this->route = (is_string($route)&&$route == 'Kowo\Ilustro\Handler\Route\StackRoute')
-            ? forward_static_call($route . '::getRoute')
-            : $route;
-        $this->request = $request;
-        $this->response = $response;
-        $this->url = new ComponentUrl($request->getPath());
+        $this->route = (is_string($container->route)&&$container->route == 'Kowo\Ilustro\Handler\Route\StackRoute')
+            ? forward_static_call($container->route . '::getRoute')
+            : $container->route;
+        $this->container = $container;
+        $this->request = $container->request;
+        $this->response = $container->response;
+        $this->url = new ComponentUrl($container->request->getPath());
     }
 
     protected function resolveAction($c)
@@ -61,15 +67,12 @@ class Dispatcher
     public function send(callable $f = null)
     {
         foreach ($this->route->getRegisterRoutes() as $index => $arr) {
-            $method = $arr['method'];
-            $url    = $arr['url'];
-            $action = $arr['action'];
-
-            if ($m = $this->matchUrl($url)) {
-                if ($this->request->compareMethod($method)) {
-                    $this->response->setDispatcher($this->route, $action, $m, 200);
+            if ($m = $this->matchUrl($arr['url'])) {
+                $mu = array_shift($m);
+                if ($this->request->compareMethod($arr['method'])) {
+                    $this->response->setDispatcher($this->route, $arr['action'], $m, 200);
                 } else {
-                    throw new \Exception(sprintf('method %s not issued by this url', $method));
+                    throw new \Exception(sprintf('method %s not issued by this url', $arr['method']));
                 }
                 break;
             }

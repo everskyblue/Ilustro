@@ -121,27 +121,25 @@ section {
     word-break: break-all;
 }
 .code-wrapper {
-    background: #101010;
+    background: #000810;
     line-height: 25px;
     color: #dfdfdf;
     width: 100%;
     max-height: 50%;
     overflow-y: auto;
-}
-.code-wrapper > * {
-    display: inline-table;
+    display: flex
 }
 .code-source {
     overflow: auto;
     height: 100%;
 }
 .code-wrapper .code-lines{
-    background: #000810;
     color: white;
     text-align: right;
     padding-right: 5px;
-    min-width: 5%;
-    box-shadow: 1.3px 0 3px rgba(0,0,0,.50)
+    min-width: 3%;
+    height: max-content;
+    box-shadow: 1.3px 0 3px #8e8b8b80
 }
 
 .bugs {

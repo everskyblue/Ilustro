@@ -19,8 +19,7 @@ class IRegister {
      */
     public function add($dir, array $ns)
     {
-        $this->base_dir = $dir;
-        $this->namespace = array_merge($this->namespace, $ns);
+        $this->namespace[$dir] = array_merge($this->namespace, $ns);
         return $this;
     }
     
@@ -32,14 +31,24 @@ class IRegister {
      * @param string $name nombre de la clase
      * @return string
      */
-    public function __get($name)
+    public function resolvePath($name)
     {
         $rp = ['/', '\\'];
-        foreach($this->namespace as $ns => $dir) {
-            if (strpos($name, $ns)!==false||$name===$ns){
-                $path = str_replace($ns, $dir, $name);
-                return $this->absPath($rp, $path);
-            } 
+        foreach($this->namespace as $base => $nss) {
+            foreach ($nss as $ns => $dir) {
+                $xn = explode('\\', $ns);
+                $xc = array_slice(
+                    explode('\\', $name),
+                    0,
+                    count($xn)
+                );
+
+                if ($xc == $xn) {
+                    $path = $base . str_replace($ns, $dir, $name);
+                    return $this->absPath($rp, $path);
+                }
+            }
+            
         }
         return $this->absPath($rp, $name);
     }
@@ -51,6 +60,6 @@ class IRegister {
      */
     private function absPath($m, $rp)
     {
-        return $this->base_dir . str_replace($m, DIRECTORY_SEPARATOR, $rp);
+        return str_replace($m, DIRECTORY_SEPARATOR, $rp);
     }
 }
