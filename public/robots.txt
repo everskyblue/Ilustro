@@ -1,0 +1,4 @@
+User-Agent: *
+Disallow: /api
+
+#Sitemap: http://web.com/sitemap.xml
