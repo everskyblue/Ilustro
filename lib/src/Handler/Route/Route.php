@@ -184,7 +184,7 @@ class Route {
                 }
             }
         }
-        return preg_replace('/\//i', '\/', $url).'/?';
+        return preg_replace('/[\/|\=]/', '\\\\$0', $url).'/?';
     }
 
     /**

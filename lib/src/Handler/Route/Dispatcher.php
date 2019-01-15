@@ -29,7 +29,7 @@ class Dispatcher
      * @var ComponentUrl
      */
     protected $url;
-    
+
     /**
      * @var Kowo\Ilustro\Wrapper\Capsule
      */
@@ -67,6 +67,7 @@ class Dispatcher
     public function send(callable $f = null)
     {
         foreach ($this->route->getRegisterRoutes() as $index => $arr) {
+            //var_dump((new ComponentUrl($arr['url']))->getQuery());
             if ($m = $this->matchUrl($arr['url'])) {
                 $mu = array_shift($m);
                 if ($this->request->compareMethod($arr['method'])) {
@@ -79,10 +80,11 @@ class Dispatcher
         }
 
         if (!$this->response->isSuccess()) {
-            $this->response->setDispatcher($this->route, ($f?:function(){})->bind($f, $this), [], 404);
+            $this->response->setDispatcher($this->route, ($f?:function(){})->bindTo($f, $this), [], 404);
         }
 
         $this->response->send();
+        //$this->container->firware($this->request, $this->response);
     }
 
     /**

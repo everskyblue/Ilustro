@@ -47,6 +47,15 @@ class Capsule implements \ArrayAccess, \Countable {
     }
 
     /**
+     * @param string $name
+     * @param array $args
+     */
+    public function __call($name, $args)
+    {
+        return \call_user_func_array($this->get($name), $args);
+    }
+
+    /**
      * @param string $key
      * @throws \RuntimeException
      * @return mixed
