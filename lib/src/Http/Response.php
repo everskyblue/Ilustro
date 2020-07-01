@@ -156,11 +156,10 @@ class Response {
     /**
      * @param mixed $rv
      */
-    protected function setContentView($rv)
+    public function setContentView($rv)
     {
         if (is_object($rv)) {
             ob_start();
-            var_dump($rv);
             $content = ob_get_contents();
             ob_clean();
         } elseif (is_array($rv)) {

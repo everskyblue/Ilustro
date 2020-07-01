@@ -3,25 +3,23 @@
 namespace Kowo\Ilustro\Handler\Route;
 
 
-use Kowo\Ilustro\Http\Request;
-use Kowo\Ilustro\Http\Response;
 use Kowo\Ilustro\Http\Url\Component as ComponentUrl;
 
 
 class Dispatcher
 {
     /**
-     * @var Kowo\Ilustro\Handler\Route
+     * @var \Kowo\Ilustro\Handler\Route
      */
     protected $route;
 
     /**
-     * @var Kowo\Ilustro\Http\Request
+     * @var \Kowo\Ilustro\Http\Request
      */
     protected $request;
 
     /**
-     * @var Kowo\Ilustro\Http\Response
+     * @var \Kowo\Ilustro\Http\Response
      */
     protected $response;
 
@@ -31,15 +29,13 @@ class Dispatcher
     protected $url;
 
     /**
-     * @var Kowo\Ilustro\Wrapper\Capsule
+     * @var \Kowo\Ilustro\Wrapper\Capsule
      */
     protected $container;
 
     /**
-     * Dispatcher constructor.
-     * @param string | Kowo\Ilustro\Handler\Route $route
-     * @param Kowo\Ilustro\Http\Request $request
-     * @param Kowo\Ilustro\Http\Response $response
+     * constructor
+     * @param \Kowo\Ilustro\Handler\Route\Container $container
      */
     public function __construct($container)
     {
@@ -52,13 +48,13 @@ class Dispatcher
         $this->url = new ComponentUrl($container->request->getPath());
     }
 
-    protected function resolveAction($c)
+    /*protected function resolveAction($c)
     {
         return (is_string($c)
                  ? $this->route->resolveClass($c, $this->container)
                  : $c
         );
-    }
+    }*/
 
     /**
      * @param callable|null $f
@@ -67,9 +63,8 @@ class Dispatcher
     public function send(callable $f = null)
     {
         foreach ($this->route->getRegisterRoutes() as $index => $arr) {
-            //var_dump((new ComponentUrl($arr['url']))->getQuery());
             if ($m = $this->matchUrl($arr['url'])) {
-                $mu = array_shift($m);
+                array_shift($m);
                 if ($this->request->compareMethod($arr['method'])) {
                     $this->response->setDispatcher($this->route, $arr['action'], $m, 200);
                 } else {
@@ -80,7 +75,7 @@ class Dispatcher
         }
 
         if (!$this->response->isSuccess()) {
-            $this->response->setDispatcher($this->route, ($f?:function(){})->bindTo($f, $this), [], 404);
+            $this->response->setDispatcher($this->route, $f, [], 404);
         }
 
         $this->response->send();

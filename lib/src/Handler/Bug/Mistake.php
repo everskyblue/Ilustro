@@ -45,7 +45,7 @@ class Mistake {
     /**
      * @return $this
      */
-    public function reportError()
+    public function reportError(): self
     {
         set_error_handler([$this, 'errTpl']);
         return $this;
@@ -53,11 +53,11 @@ class Mistake {
 
     /**
      * @param int $errno
-     * @param syring $msg
+     * @param string $msg
      * @param string $errfile
      * @param int $errline
      */
-    public function errTpl($errno, $msg, $errfile, $errline)
+    public function errTpl(int $errno, string $msg, string $errfile, int $errline)
     {
         $this->message('HUBO UN ERROR INTERNO', $msg, $errno);
         $this->output($errfile, $errline, $errfile);
@@ -66,7 +66,7 @@ class Mistake {
     /**
      * @return $this
      */
-    public function reportException()
+    public function reportException(): self
     {
         set_exception_handler([$this, 'exTpl']);
         return $this;
