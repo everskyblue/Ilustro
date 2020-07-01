@@ -2,7 +2,6 @@
 
 namespace Kowo\Ilustro\Handler\Bug;
 
-
 trait MistakeBodyTrait {
 
     /**
@@ -48,7 +47,7 @@ trait MistakeBodyTrait {
      */
     public function setMenuItem($title, $icon, $referer  = '')
     {
-        $this->menu_items[] = [$title, $icon, $referer];
+        $this->menu_items[] = [$title, constant('PATH_ICON') . $icon, $referer];
     }
 
     /**

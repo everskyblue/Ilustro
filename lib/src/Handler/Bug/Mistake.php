@@ -6,6 +6,14 @@ namespace Kowo\Ilustro\Handler\Bug;
 use Kowo\Ilustro\Html\Tag;
 
 
+if (!defined('PATH_ICON')) {
+    define('PATH_ICON', 
+        ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://') .
+        $_SERVER['SERVER_NAME'] . 
+        '/public/assets/image/framework/'
+    );
+}
+
 /**
  * @package Kowo\Ilustro\Handler\Bug
  */

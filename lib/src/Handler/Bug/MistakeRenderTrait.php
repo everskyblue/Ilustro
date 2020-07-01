@@ -199,7 +199,7 @@ trait MistakeRenderTrait {
         }
 
         $footer ='<div><p>
-            <img width="24px" src="ic_memory.png"> '. convert(memory_get_usage(true)).
+            <img width="24px" src="'. constant('PATH_ICON') .'ic_memory.png"> '. convert(memory_get_usage(true)).
         '</p></div>';
         $footer .= '<div> php v-'.PHP_VERSION.'</div>';
         return $footer;
