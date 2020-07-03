@@ -15,7 +15,7 @@ define('ILUSTRO_START', microtime(true));
  * incluir el cargador de archivo
  */
 $file = ILUSTRO_BASE . '/vendor/autoload.php';
-if (file_exists($file))
+if (!file_exists($file))
     require $file;
 else
     require ILUSTRO_BASE . '/bootstrap/autoload.php';

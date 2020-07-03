@@ -1,6 +1,5 @@
 <?php
-
-$ini = parse_ini_file(ILUSTRO_BASE . '/env.ini');
+$GLOBALS['ini'] = parse_ini_file(ILUSTRO_BASE . '/env.ini');
 
 if (!function_exists('config')) {
     function config($key) {
@@ -36,5 +35,3 @@ if (!function_exists('base_url')) {
         return ILUSTRO_BASE . DIRECTORY_SEPARATOR . $url;
     }
 }
-
-include ILUSTRO_BASE . '/app/config.php';

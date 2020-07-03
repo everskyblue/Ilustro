@@ -1,0 +1,25 @@
+{
+    "name": "everskyblue/ilustro",
+    "type": "project",
+    "require": {
+        "twig/twig": "3.x-dev"
+    },
+    "autoload": {
+        "files": [
+            "lib/src/helper.php",
+            "app/config.php"
+        ],
+        "psr-4": {
+            "Kowo\\Ilustro\\": "lib/src/",
+            "App\\": "app/"
+        }
+    },
+    "license": "BSD 3-Clause",
+    "authors": [
+        {
+            "name": "fernik",
+            "email": "nikejoelmadrid@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}

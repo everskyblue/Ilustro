@@ -1,6 +1,7 @@
 <?php
 
 include ILUSTRO_BASE . "/lib/src/loader/IBootloader.php";
+include ILUSTRO_BASE . '/app/config.php';
 include_once PEWE_DIR . "/helper.php";
 
 /**
