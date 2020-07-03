@@ -2,6 +2,7 @@
 
 namespace Kowo\Ilustro;
 
+use Kowo\Ilustro\Handler\Bug\Mistake;
 use Kowo\Ilustro\Wrapper\Capsule as Container;
 use Kowo\Ilustro\Handler\Route\Route;
 use Kowo\Ilustro\Handler\Route\Dispatcher;
@@ -21,15 +22,16 @@ class Ilustro {
      */
     public $container;
 
+    protected $handler_error;
+
     /**
      * @param mixed $firware
      */
-    public function __construct($firware)
+    public function __construct(Mistake $ms)
     {
+        $this->handler_error = $ms;
         $this->container = new Container();
-        $this->container->register('firware', function () use ($firware) {
-            return $firware;
-        });
+        $this->initialContainer();
     }
 
     /**
@@ -40,7 +42,9 @@ class Ilustro {
     {
         $this->container->register('route', Route::class);
         $this->container->register('request', Request::class);
-        $this->container->register('response', Response::class, ['request']);
+        $this->container->register('response', function($container) {
+            return new Response($container->request, $container);
+        });
         $this->container->register('dispatcher', Dispatcher::class, ['capsule']);
     }
 
@@ -72,11 +76,13 @@ class Ilustro {
 
     /**
      * instaciar la clase
+     * @param Mistake $ms
      * @return self
      */
-    public static function create($firware = null)
+    public static function create(Mistake $ms)
     {
-        return new self($firware);
+
+        return new self($ms);
     }
 
     /**
@@ -88,12 +94,14 @@ class Ilustro {
         ini_set('date.timezone', \config('app.timezone'));
         switch (\config('app.env')) {
             case 'production':
-                ini_set('display_errors', true);
+                ini_set('display_errors', 0);
             break;
+            case 'development':
             default:
-                ini_set('display_errors', false);
+                ini_set('display_errors', 1);
             break;
         }
+        $this->handler_error->setHandler()->initializeContent();
     }
 
     /**
@@ -101,7 +109,6 @@ class Ilustro {
      */
     public function dispatchAppliction()
     {
-        $this->initialContainer();
         $this->web();
         $this->send();
     }

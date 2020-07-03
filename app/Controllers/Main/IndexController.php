@@ -8,6 +8,6 @@ class IndexController extends AppController
 {
     public function home()
     {
-        return 'home';
+        return $this->view->render('index.twig', ['title' => 'Ilustro framework']);
     }
 }

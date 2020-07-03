@@ -1,4 +1,10 @@
 <?php
+/**
+ * definir esta variable con $GLOBALS para que no ocurra un error
+ * al llamar el autoload de composer, no renoce la definicion de la variable
+ * $ini = parse_ini_file(ILUSTRO_BASE . '/env.ini'); retorna un valor nulo
+ * dentro la las funcion declarada
+ */
 $GLOBALS['ini'] = parse_ini_file(ILUSTRO_BASE . '/env.ini');
 
 if (!function_exists('config')) {
@@ -11,7 +17,7 @@ if (!function_exists('config')) {
                 $key_array = 'config.'.$key_array;
                 $x = 1;
             }
-            if(isset($ini[$key_array])){
+            if(array_key_exists($key_array, $ini)){
                 $ini = $ini[$key_array];
             }else{
                 throw new \Exception("key {$key_array} not exits");

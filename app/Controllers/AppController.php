@@ -8,7 +8,7 @@ abstract class AppController
     protected $container;
     
     /**
-     * @param Kowo\Ilustro\Wrapper\Capsule $container
+     * @param \Kowo\Ilustro\Wrapper\Capsule $container
      */
     public function __construct($container)
     {

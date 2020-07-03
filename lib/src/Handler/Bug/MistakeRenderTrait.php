@@ -287,6 +287,8 @@ trait MistakeRenderTrait {
 
         $this->structureHTML();
 
+        http_response_code(500);
+
         die((Tag::render($this->html)));
     }
 }

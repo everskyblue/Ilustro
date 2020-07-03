@@ -1,8 +1,8 @@
 <?php
 
 include ILUSTRO_BASE . "/lib/src/loader/IBootloader.php";
-include ILUSTRO_BASE . '/app/config.php';
 include_once PEWE_DIR . "/helper.php";
+include ILUSTRO_BASE . '/app/config.php';
 
 /**
  * constante PEWE_DIR define el directorio base de la libreria

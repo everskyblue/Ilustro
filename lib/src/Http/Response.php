@@ -156,7 +156,7 @@ class Response {
     /**
      * @param mixed $rv
      */
-    public function setContentView($rv)
+    public function setContentView($rv): self
     {
         if (is_object($rv)) {
             ob_start();
@@ -175,6 +175,8 @@ class Response {
         $this->output_content = $content;
 
         $this->withHeader('Content-Length', strlen((string)$content));
+
+        return $this;
     }
 
     /**
