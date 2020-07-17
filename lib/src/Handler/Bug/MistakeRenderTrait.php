@@ -251,17 +251,28 @@ trait MistakeRenderTrait {
 
     protected function createMenu()
     {
-        $menu = Tag::nav(Tag::attr([
+        $tg = Tag::component('string ri');
+        $nav = Tag::nav(Tag::attr([
             'class' => 'ms-nav-menu'
-        ]))->generate(count($this->menu_items), 'div', Tag::attr([
-            'class' => 'ms-menu-item'
-        ]))->insideAll();
+        ]));
 
-        $append = Tag::structure($menu)->span->img(TAG::NOT_CLOSE, Tag::attr([
+        foreach ($this->menu_items as $menu) {
+            $div =  Tag::div(Tag::attr([
+                'class' => 'ms-menu-item'
+            ]));
+            var_dump($menu);
+            $div->insertChild(Tag::span($menu[0]));
+            $nav->insertChild($div);
+        }
+        
+        $struct = Tag::structure($nav);
+
+        $struct->span->img(TAG::NOT_CLOSE, Tag::attr([
             'async' => true
         ]))->append('attr:class@ms-menu-item');
-        $append->setTreeElement($this->body);
-        $append->query('tag:header')->push($menu->getNode());
+        exit(Tag::render($nav));;
+        $struct->setTreeElement($this->body);
+        $struct->query('tag:header')->push($nav->getNode());
     }
 
     /**
@@ -271,6 +282,8 @@ trait MistakeRenderTrait {
      */
     protected function output($file, $line, $stack)
     {
+        if (!((int)ini_get('display_errors'))) die();
+        
         $o_source = $this->createSourceContent($file, $line);
 
         $section = $this->sectionMsg();

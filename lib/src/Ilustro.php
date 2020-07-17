@@ -109,6 +109,7 @@ class Ilustro {
      */
     public function dispatchAppliction()
     {
+        echo $bn;
         $this->web();
         $this->send();
     }

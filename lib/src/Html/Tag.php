@@ -41,7 +41,7 @@ class Tag {
      * @param string|null $a
      * @return AppendNode
      */
-    public static function append($t, $a = nul, TreeElement $to = null)
+    public static function append($t, $a = null, TreeElement $to = null)
     {
         return new AppendNode($to ?: self::$e, $t, $a);
     }

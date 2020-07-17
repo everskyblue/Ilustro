@@ -4,7 +4,7 @@ namespace Kowo\Ilustro\Handler\Bug;
 
 
 use Kowo\Ilustro\Html\Tag;
-use Throwable;
+use Throwable, ErrorException;
 
 if (!defined('PATH_ICON')) {
     define('PATH_ICON', 
@@ -22,6 +22,16 @@ class Mistake {
     use MistakeBodyTrait, MistakeRenderTrait;
 
     /**
+     * @var string
+     */
+    public const ON_ERROR = 'error';
+
+    /**
+     * @var string
+     */
+    public const ON_EXCEPTION = 'exception';
+
+    /**
      * @var MistakeConfig
      */
     protected $config;
@@ -29,7 +39,7 @@ class Mistake {
     /**
      * @var array
      */
-    protected $entry = [];
+    protected $events = [];
 
     /**
      * @param MistakeConfig $mc
@@ -54,21 +64,12 @@ class Mistake {
      */
     public function setError(): self
     {
-        set_error_handler([$this, 'errTpl']);
+        set_error_handler(function (int $errno, string $msg, string $errfile, int $errline) {
+            if (!in_array($errno, $this->config->exclude_type_errors) && (error_reporting() & $errno)) {
+                throw new ErrorException($msg, 0, $errno, $errfile, $errline);
+            }
+        });
         return $this;
-    }
-
-    /**
-     * @param int $errno
-     * @param string $msg
-     * @param string $errfile
-     * @param int $errline
-     */
-    public function errTpl(int $errno, string $msg, string $errfile, int $errline)
-    {
-        $this->message('HUBO UN ERROR INTERNO', $msg, $errno);
-        $this->entry = [$errfile, $errline, $errfile];
-        $this->commit();
     }
 
     /**
@@ -76,37 +77,37 @@ class Mistake {
      */
     public function setException(): self
     {
-        set_exception_handler([$this, 'exTpl']);
+        set_exception_handler([$this, 'commit']);
         return $this;
     }
 
     /**
-     * @param Exception $e
+     * @param Throwable $e
      */
-    public function exTpl($e)
+    public function commit(Throwable $e)
     {
         $this->message('Exception: '. get_class($e), $e->getMessage(), $e->getCode());
-        $this->output(
+        // try {
+            $this->output(
             $e->getFile(),
             $e->getLine(),
             $e->getTraceAsString()
         );
+        /* } catch (\Throwable $th) {
+            var_dump($th->getMessage());
+        } */
+        
     }
 
     /**
      * añade una excepcion
      *
-     * @param \Throwable $th
+     * @param callable $fn
      * @return void
      */
-    public function on(\Throwable $th)
+    public function on(callable $fn)
     {
-
-    }
-
-    public function commit()
-    {
-        $this->output(...$this->entry);
+        $this->events[] = $fn;
     }
 
     /**

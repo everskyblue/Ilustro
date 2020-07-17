@@ -2,6 +2,8 @@
 
 namespace Kowo\Ilustro\Html;
 
+use Throwable;
+
 /**
  * @package Kowo\Ilustro\Html
  */
@@ -42,19 +44,14 @@ class TreeElement extends MagicTags implements CallerInterface {
 
     /**
      * @param int $g
-     * @param array | AttrNode $tgs
-     * @param null | AttrNode $attr
+     * @param array|AttrNode $tgs
+     * @param null|AttrNode $attr
      * @return $this
      */
-    public function generate($g, $tgs = [], $attr = null)
+    public function generate(int $g, $tgs = [], $attr = null)
     {
-        if (is_null($attr) && is_object($tgs)) {
-            $attr = $tgs;
-            $tgs = $this->node_name;
-        }
-
         for ($x = 0; $x < $g; $x++) {
-            $nn = $this->utilGen($x, $tgs);
+            $nn = $this->utilGen($x,  is_object($tgs) ? $tgs->node_name : $tgs);
             if (!is_null($attr) && $attr instanceof AttrNode) {
                 foreach ($attr->get() as $key => $val) {
                     if (is_array($val)) {
@@ -72,7 +69,6 @@ class TreeElement extends MagicTags implements CallerInterface {
             }
             $this->insert_node[] = $nn;
         }
-
         return $this;
     }
 

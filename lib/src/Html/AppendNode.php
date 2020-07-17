@@ -89,7 +89,7 @@ class AppendNode {
             } elseif ($type === 'attr' && isset($node['attr']) && call_user_func_array([$node['attr'], 'compare'], explode('@', $this->ftag[1]))) {
                 $node = $this->mergeNode($node, $push);
             }
-
+        
             $nodes[$i]['body'] = $this->findPush($node['body'], $push);
         }
         return $nodes;

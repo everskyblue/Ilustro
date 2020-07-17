@@ -8,18 +8,12 @@ class MistakeConfig {
     /**
      * @var array
      */
-    private $app = [
+    private $config = [
         'debug' => true,
 
         'log' => false,
 
-        'non_report_error_type' => null
-    ];
-
-    /**
-     * @var array
-     */
-    private $handler = [
+        'exclude_type_errors' => []
     ];
 
     /**
@@ -27,15 +21,7 @@ class MistakeConfig {
      */
     public function __construct(array $c = [])
     {
-        $this->app = array_merge($this->app, $c);
-    }
-
-    /**
-     * @param array $h
-     */
-    public function setHandler(array $h)
-    {
-        $this->handler[] += $h;
+        $this->config = array_merge($this->config, $c);
     }
 
     /**
@@ -43,6 +29,6 @@ class MistakeConfig {
      */
     public function __get($k)
     {
-        return $this->app[$k];
+        return $this->config[$k];
     }
 }
