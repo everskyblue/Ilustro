@@ -8,7 +8,7 @@ $app->container->register('view', function() {
     return new \Twig\Environment(new \Twig\Loader\FilesystemLoader(ILUSTRO_BASE . '/static/views'), [
         'debug' => true,
         'strict_variables' => true,
-        'cache' => false //ILUSTRO_BASE . '/.cache/views'
+        'cache' => ILUSTRO_BASE . '/.cache/views'
     ]);
 });
 

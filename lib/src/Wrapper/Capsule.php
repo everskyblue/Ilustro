@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Wrapper;
+namespace Ilustro\Wrapper;
 
 
 class Capsule implements \ArrayAccess, \Countable {
@@ -72,7 +72,7 @@ class Capsule implements \ArrayAccess, \Countable {
      * @param string $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return $this->exists($offset);
     }
@@ -82,7 +82,7 @@ class Capsule implements \ArrayAccess, \Countable {
      * @throws \RuntimeException
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         if(!$this->exists($offset)){
             throw new \RuntimeException("the key {$offset} not exists");
@@ -135,7 +135,7 @@ class Capsule implements \ArrayAccess, \Countable {
      * @param string $offset
      * @param string|array $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->register($offset, $value);
     }
@@ -143,7 +143,7 @@ class Capsule implements \ArrayAccess, \Countable {
     /**
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $this->delete($offset);
     }
@@ -151,7 +151,7 @@ class Capsule implements \ArrayAccess, \Countable {
     /**
      * @return array
      */
-    public function count()
+    public function count(): int
     {
         return $this->register;
     }
@@ -170,7 +170,7 @@ class Capsule implements \ArrayAccess, \Countable {
      * @param string $key
      * @return bool
      */
-    protected function exists($key)
+    protected function exists(mixed $key): bool
     {
         return isset($this->register[$key]);
     }

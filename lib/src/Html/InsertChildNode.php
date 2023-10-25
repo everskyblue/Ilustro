@@ -1,17 +1,17 @@
 <?php
 
-namespace Kowo\Ilustro\Html;
+namespace Ilustro\Html;
 
 
 /**
- * @package Kowo\Ilustro\Html
+ * @package Ilustro\Html
  */
 class InsertChildNode extends MagicTags implements CallerInterface {
 
     /**
      * @var TreeElement
      */
-    protected $he;
+    protected $treeElement;
 
     /**
      * @var AppendNode
@@ -24,11 +24,11 @@ class InsertChildNode extends MagicTags implements CallerInterface {
     protected $insert = [];
 
     /**
-     * @param TreeElement $he
+     * @param TreeElement $treeElement
      */
-    public function __construct(TreeElement $he)
+    public function __construct(TreeElement $treeElement)
     {
-        $this->he = $he;
+        $this->treeElement = $treeElement;
     }
 
     /**
@@ -45,12 +45,12 @@ class InsertChildNode extends MagicTags implements CallerInterface {
      * @param array $t
      * @return array
      */
-    protected function recursive(array $m, array $t)
+    protected function recursive(array $parent, array $childs)
     {
-        if(isset($t[0])&&empty($t[0]['body'])) {
-            array_push($m['body'], $this->recursive(array_shift($t), $t));
+        if(isset($childs[0])&&empty($childs[0]['body'])) {
+            array_push($parent['body'], $this->recursive(array_shift($childs), $childs));
         }
-        return $m;
+        return $parent;
     }
 
     /**
@@ -60,7 +60,7 @@ class InsertChildNode extends MagicTags implements CallerInterface {
      */
     public function append($t, $a = null)
     {
-        return Tag::append($t, $a, $this->he)->push(
+        return Tag::append($t, $a, $this->treeElement)->push(
             [$this->recursive(array_shift($this->insert), $this->insert)]
         );
     }

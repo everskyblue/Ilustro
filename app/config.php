@@ -1,8 +1,8 @@
 <?php
 
 $GLOBALS['config.web'] = [
-    'route' => base_url('web/route.php'),
-    'api' => base_url('web/api.php')
+    'route' => base_url('bootstrap/web/route.php'),
+    'api' => base_url('bootstrap/web/api.php'),
 ];
 
 $GLOBALS['config.app'] = [
@@ -45,5 +45,9 @@ $GLOBALS['config.app'] = [
     /**
      *	log de errores
     */
-    'log' => env('LOG')
+    'log' => env('LOG'),
+    
+    'fs_route' => true,
+    
+    'path_pages' => base_url('app/pages'),
 ];

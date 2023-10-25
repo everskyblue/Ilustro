@@ -1,9 +1,9 @@
 <?php
 
-namespace Kowo\Ilustro\Http;
+namespace Ilustro\Http;
 
 
-use Kowo\Ilustro\Http\Url\Component as ComponentUrl;
+use lustro\Http\Url\Component as ComponentUrl;
 
 class Request {
 

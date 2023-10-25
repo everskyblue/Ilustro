@@ -1,21 +1,21 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Bug;
+namespace Ilustro\Handler\Bug;
 
 
-use Kowo\Ilustro\Html\Tag;
+use Ilustro\Html\Tag;
 use Throwable, ErrorException;
 
 if (!defined('PATH_ICON')) {
     define('PATH_ICON', 
-        ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://') .
-        $_SERVER['SERVER_NAME'] . 
+        //((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://') .
+        //$_SERVER['SERVER_NAME'] . ':'. $_SERVER["SERVER_PORT"] . 
         '/public/assets/image/framework/'
     );
 }
 
 /**
- * @package Kowo\Ilustro\Handler\Bug
+ * @package Ilustro\Handler\Bug
  */
 class Mistake {
 
@@ -86,6 +86,7 @@ class Mistake {
      */
     public function commit(Throwable $e)
     {
+        $this->initializeContent();
         $this->message('Exception: '. get_class($e), $e->getMessage(), $e->getCode());
         // try {
             $this->output(
@@ -93,6 +94,7 @@ class Mistake {
             $e->getLine(),
             $e->getTraceAsString()
         );
+        $this->output();
         /* } catch (\Throwable $th) {
             var_dump($th->getMessage());
         } */

@@ -1,12 +1,12 @@
 <?php
 
-namespace Kowo\Ilustro;
+namespace Ilustro;
 
-use Kowo\Ilustro\Handler\Bug\Mistake;
-use Kowo\Ilustro\Wrapper\Capsule as Container;
-use Kowo\Ilustro\Handler\Route\Route;
-use Kowo\Ilustro\Handler\Route\Dispatcher;
-use Kowo\Ilustro\Http\{Request, Response};
+use Ilustro\Handler\Bug\Mistake;
+use Ilustro\Wrapper\Capsule as Container;
+use Ilustro\Handler\Router;
+use Ilustro\Handler\Route\Dispatcher;
+use Ilustro\Http\{Request, Response};
 
 /**
  * main class
@@ -17,12 +17,9 @@ use Kowo\Ilustro\Http\{Request, Response};
  */
 
 class Ilustro {
-    /**
-     * @var Container
-     */
-    public $container;
+    public Container $container;
 
-    protected $handler_error;
+    protected Mistake $handler_error;
 
     /**
      * @param mixed $firware
@@ -40,9 +37,9 @@ class Ilustro {
      */
     protected function initialContainer()
     {
-        $this->container->register('route', Route::class);
+        $this->container->register('route', fn($container) => new Router($container, require_once(base_url('app/middleware.php'))));
         $this->container->register('request', Request::class);
-        $this->container->register('response', function($container) {
+        $this->container->register('response', function($container): Response {
             return new Response($container->request, $container);
         });
         $this->container->register('dispatcher', Dispatcher::class, ['capsule']);
@@ -81,7 +78,6 @@ class Ilustro {
      */
     public static function create(Mistake $ms)
     {
-
         return new self($ms);
     }
 
@@ -109,7 +105,6 @@ class Ilustro {
      */
     public function dispatchAppliction()
     {
-        echo $bn;
         $this->web();
         $this->send();
     }

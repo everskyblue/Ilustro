@@ -1,32 +1,19 @@
 <?php
 
-namespace Kowo\Ilustro\Http\Request;
+namespace Ilustro\Http\Request;
 
 trait Data
 {
-    /**
-     * @var array añade los parametros de la cookie
-     */
-    protected $cookie = [];
+    protected array $cookie = [];
 
-    /**
-     * @var array añade parametros al stream php
-     */
-    protected $streamInput = [];
+    protected array $streamInput = [];
 
-    /**
-     * @var  null|object|array obtiene stream input
-     */
-    protected $body;
+    protected mixed $body;
 
     /**
      * parametros enviado por get
-     *
-     * @access public
-     * @param null $key
-     * @return mixed
      */
-    public function getQueryParams($key = null)
+    public function getQueryParams(string $key = null): mixed
     {
         $query = [];
 
@@ -37,12 +24,8 @@ trait Data
 
     /**
      * obtiene los valores enviados por el form y añade los valores en array
-     *
-     * @access protected
-     * @param null $name
-     * @return array|string
      */
-    protected function streamInput($name = null)
+    protected function streamInput(string $name = null): array | string
     {
         $content = file_get_contents('php://input');
 
@@ -59,23 +42,12 @@ trait Data
         return (is_null($name) ? $this->streamInput : (isset($this->streamInput[$name]) ? $this->streamInput[$name] : null));
     }
 
-    /**
-     * @access public
-     * @param null $name
-     * @return array
-     */
-    public function body($name = null)
+    public function body(string $name = null): mixed
     {
         return $this->streamInput($name);
     }
 
-    /**
-     * content type enviados o aceptados
-     *
-     * @access public
-     * @return array
-     */
-    public function getAccept()
+    public function getAccept(): array
     {
         $accept = $this->getHeader('ACCEPT');
         $divide = explode(';', $accept);
@@ -92,11 +64,7 @@ trait Data
         return array_merge($getType, $qv);
     }
 
-    /**
-     * @access public
-     * @return array|string
-     */
-    public function getBodyParams()
+    public function getBodyParams(): array | string
     {
         $type = $this->getVar('CONTENT_TYPE');
         $split = explode(' ', $type);
@@ -114,60 +82,33 @@ trait Data
         return $this->body;
     }
 
-    /**
-     * @access public
-     * @return array
-     */
-    public function getUploadedFiles()
+    public function getUploadedFiles(): array
     {
         return $_FILES;
     }
 
-    /**
-     * @access public
-     * @return array
-     */
-    public function getCookieParams()
+    public function getCookieParams(): array
     {
         return $_COOKIE;
     }
 
-    /**
-     * @access public
-     * @return array
-     */
-    public function getServerParams()
+    public function getServerParams(): array
     {
         return $_SERVER;
     }
 
-    /**
-     * @access public
-     * @return array
-     */
-    public function getPostParams()
+    public function getPostParams(): array
     {
         return $_POST;
     }
 
-    /**
-     * @access public
-     * @param string $key
-     * @return mixed
-     */
-    public function getPostParam($key)
+    public function getPostParam(string $key): mixed
     {
         $post = $this->getPostParams();
         return isset($post[$key]) ? $post[$key] : null;
     }
 
-    /**
-     * obtien el path de la url removiendo el script que se esta ejecutando
-     *
-     * @access public
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         $request = $this->getVar('REQUEST_URI');
         if(strpos($request, '/') !== false){
@@ -179,13 +120,7 @@ trait Data
         return $request ? $request : '/';
     }
 
-    /**
-     * obtiene las cookie principales enviadas por php
-     *
-     * @access public
-     * @return array
-     */
-    public function getCookie()
+    public function getCookie(): array
     {
         $cookie = $this->getHeader('COOKIE');
         $cookie = str_replace(';', '&', $cookie);
@@ -200,57 +135,31 @@ trait Data
         return $trackid + $phpsessid;
     }
 
-    /**
-     * @access public
-     * @return array
-     */
-    public function getAllCookie()
+    public function getAllCookie(): array
     {
         return  $this->cookie;
     }
 
-    /**
-     * obtiene la version del protocol que se esta ejecutando
-     *
-     * @access public
-     * @return float|string
-     */
-    public function getVersionProtocol()
+    public function getVersionProtocol(): string
     {
         $protocol = $this->getVar('SERVER_PROTOCOL');
         if($int = strpos($protocol, '/')){
             $version = substr($protocol, $int + 1);
         }
-        return isset($version) ? (float)$version : $protocol;
+        return isset($version) ? $version : $protocol;
     }
 
-    /**
-     * protocol http | https
-     *
-     * @access public
-     * @return string
-     */
-    public function getProtocol()
+    public function getProtocol(): string
     {
         return $this->isSsl() ? 'https' : 'http';
     }
 
-    /**
-     * @access public
-     * @return string numero del puerto
-     */
-    public function getPort()
+    public function getPort(): string
     {
         return $this->getVar('SERVER_PORT');
     }
 
-    /**
-     * obtiene el host con el puerto
-     *
-     * @access public
-     * @return string
-     */
-    public function getNameHost()
+    public function getNameHost(): string
     {
         $ptl = $this->getProtocol();
         $port = $this->getPort();
@@ -268,13 +177,7 @@ trait Data
         return $ssl . '://'. $this->getHost() . ':' . $port;
     }
 
-    /**
-     * obtiene nombre del host removiendo el puerto si existe
-     *
-     * @access public
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         $host = $this->getHeader('HOST');
         if($length = strpos($host, ':')){
@@ -283,39 +186,22 @@ trait Data
         return (string)$host;
     }
 
-    /**
-     * @access protected
-     * @return string
-     */
-    protected function isSsl()
+    protected function isSsl(): bool
     {
         return $this->getHeader('HTTPS') ? true : false;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAjax()
+    public function isAjax(): bool
     {
         return ($this->getHeader('X_REQUESTED_WITH') == 'XMLHttpRequest');
     }
 
-    /**
-     * @access protected
-     * @param string $key
-     * @return null|string
-     */
-    protected function getVar($key)
+    protected function getVar(string $key): mixed
     {
         return isset($_SERVER[$key]) ? $_SERVER[$key] : null;
     }
 
-    /**
-     * @access public
-     * @param string $key
-     * @return null|string
-     */
-    public function getHeader($key)
+    public function getHeader(string $key): mixed
     {
         return $this->getVar('HTTP_'.$key);
     }

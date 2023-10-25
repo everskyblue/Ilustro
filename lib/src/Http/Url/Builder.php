@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Http\Url;
+namespace Ilustro\Http\Url;
 
 
 class Builder {

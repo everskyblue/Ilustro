@@ -1,9 +1,9 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Route;
+namespace Ilustro\Handler\Route;
 
-use Kowo\Ilustro\Ilustro;
-use Kowo\Ilustro\Handler\Route;
+use Ilustro\Ilustro;
+use Ilustro\Handler\Route;
 
 class StackRoute
 {

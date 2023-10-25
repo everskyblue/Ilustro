@@ -1,14 +1,15 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Bug;
+namespace Ilustro\Handler\Bug;
 
 
-use Kowo\Ilustro\Html\Tag;
-use Kowo\Ilustro\Html\AppendNode;
+use Ilustro\Html\Tag;
+use Ilustro\Html\AppendNode;
 
 
 trait MistakeRenderTrait {
-
+    protected $content, $container, $html, $head, $body;
+    
     public function initializeContent()
     {
 
@@ -119,7 +120,7 @@ trait MistakeRenderTrait {
 
     /**
      * @param array $arr
-     * @return Kowo\Ilustro\Html\TreeElement
+     * @return Ilustro\Html\TreeElement
      */
     protected function createTable(array $arr)
     {
@@ -143,7 +144,7 @@ trait MistakeRenderTrait {
     /**
      * @param string $data
      * @param string $class_name
-     * @return Kowo\Ilustro\Html\TreeElement
+     * @return Ilustro\Html\TreeElement
      */
     protected function blockElement($data, $class_name = '')
     {
@@ -193,13 +194,13 @@ trait MistakeRenderTrait {
 
     protected function footer()
     {
-        function convert($size){
+        $convert = function($size){
             $unit=array('b','kb','mb','gb','tb','pb');
             return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
-        }
+        };
 
         $footer ='<div><p>
-            <img width="24px" src="'. constant('PATH_ICON') .'ic_memory.png"> '. convert(memory_get_usage(true)).
+            <img width="24px" src="'. constant('PATH_ICON') .'ic_memory.png"> '. $convert(memory_get_usage(true)).
         '</p></div>';
         $footer .= '<div> php v-'.PHP_VERSION.'</div>';
         return $footer;
@@ -222,7 +223,7 @@ trait MistakeRenderTrait {
                  $div->insertChild(Tag::p($exp[1], ['class' => 'bug-invk']));
             $section->insertChild($div);
         }
-
+        
         $this->content->insertChild($section);
     }
 
@@ -251,7 +252,6 @@ trait MistakeRenderTrait {
 
     protected function createMenu()
     {
-        $tg = Tag::component('string ri');
         $nav = Tag::nav(Tag::attr([
             'class' => 'ms-nav-menu'
         ]));
@@ -260,19 +260,15 @@ trait MistakeRenderTrait {
             $div =  Tag::div(Tag::attr([
                 'class' => 'ms-menu-item'
             ]));
-            var_dump($menu);
             $div->insertChild(Tag::span($menu[0]));
             $nav->insertChild($div);
         }
         
-        $struct = Tag::structure($nav);
-
-        $struct->span->img(TAG::NOT_CLOSE, Tag::attr([
+        Tag::structure($nav)->span->img(TAG::NOT_CLOSE, Tag::attr([
             'async' => true
-        ]))->append('attr:class@ms-menu-item');
-        exit(Tag::render($nav));;
-        $struct->setTreeElement($this->body);
-        $struct->query('tag:header')->push($nav->getNode());
+        ]))->append('attr:class@ms-menu-item')
+        ->setTreeElement($this->body)
+        ->query('tag:header')->push($nav->getNode());
     }
 
     /**
@@ -282,26 +278,25 @@ trait MistakeRenderTrait {
      */
     protected function output($file, $line, $stack)
     {
-        if (!((int)ini_get('display_errors'))) die();
+        if (!((int)ini_get('display_errors'))) die('output die');
         
         $o_source = $this->createSourceContent($file, $line);
 
         $section = $this->sectionMsg();
-
         $section->element->insertChild($o_source->element);
-
+        
         $this->content->insertChild($section->element);
-
+        
         $this->sectionMoreInfo();
-
+        
         $this->sectionStack(explode("\n", $stack));
-
+        
         $this->container->insertChild($this->content);
-
+        
         $this->structureHTML();
 
         http_response_code(500);
-
+        
         die((Tag::render($this->html)));
     }
 }

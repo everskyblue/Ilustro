@@ -1,8 +1,8 @@
 <?php
 
-namespace Kowo\Ilustro\Session;
+namespace Ilustro\Session;
 
-use Kowo\Ilustro\AppKey;
+use Ilustro\AppKey;
 
 class Session
 {

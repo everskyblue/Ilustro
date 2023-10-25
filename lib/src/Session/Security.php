@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Session;
+namespace Ilustro\Session;
 
 class Security
 {

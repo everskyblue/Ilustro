@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Http\Response;
+namespace Ilustro\Http\Response;
 
 
 trait TMsgCode {

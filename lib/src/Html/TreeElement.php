@@ -1,11 +1,11 @@
 <?php
 
-namespace Kowo\Ilustro\Html;
+namespace Ilustro\Html;
 
 use Throwable;
 
 /**
- * @package Kowo\Ilustro\Html
+ * @package Ilustro\Html
  */
 class TreeElement extends MagicTags implements CallerInterface {
 

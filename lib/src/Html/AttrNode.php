@@ -1,10 +1,10 @@
 <?php
 
-namespace Kowo\Ilustro\Html;
+namespace Ilustro\Html;
 
 
 /**
- * @package Kowo\Ilustro\Html
+ * @package Ilustro\Html
  */
 final class AttrNode {
     /**

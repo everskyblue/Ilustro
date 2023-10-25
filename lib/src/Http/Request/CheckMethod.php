@@ -1,121 +1,66 @@
 <?php
 
-namespace Kowo\Ilustro\Http\Request;
+namespace Ilustro\Http\Request;
 
 trait CheckMethod {
 
     /**
      * obtiene el nombre del metodo del input hidden
-     *
-     * @access protected
-     * @return string|null
      */
-    protected function getInputMethod()
+    protected function getInputMethod(): mixed
     {
         return $this->getPostParam('_method');
     }
 
     /**
      * check method http
-     *
-     * @param string $s
-     * @return bool
      */
-    public function compareMethod($s)
+    public function compareMethod(string $method): bool
     {
-        $c = $this->getInputMethod() ?: $this->getMethod();
-        if (in_array($c, explode(',', $s))) {
-            return true;
-        }
-        return false;
+        return in_array($this->getInputMethod() ?: $this->getMethod(), explode(',', $method));
     }
 
-    /**
-     * @access public
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->getVar('REQUEST_METHOD');
     }
 
-    /**
-     * @access public
-     * @param $method
-     * @return bool
-     */
-    public function isPost($method)
+    public function isPost(string $method): bool
     {
         return $this->getMethod() === $method && !$this->getInputMethod();
     }
 
-    /**
-     * @access public
-     * @param $method
-     * @return bool
-     */
-    public function isGet($method)
+    public function isGet(string $method): bool
     {
         return $this->getMethod() === $method;
     }
 
-    /**
-     * @access public
-     * @param string $method
-     * @return bool
-     */
-    public function isPut($method)
+    public function isPut(string $method): bool
     {
         return $this->getInputMethod() === $method;
     }
 
-    /**
-     * @access public
-     * @param string $method
-     * @return bool
-     */
-    public function isPatch($method)
+    public function isPatch(string $method): bool
     {
         return $this->getInputMethod() === $method;
     }
 
-    /**
-     * @access public
-     * @param string $method
-     * @return bool
-     */
-    public function isDelete($method)
+    public function isDelete(string $method): bool
     {
         return $this->getInputMethod() === $method;
     }
 
-    /**
-     * @access public
-     * @param string $method
-     * @return bool
-     */
-    public function isHead($method)
+    public function isHead(string $method): bool
     {
         return $this->getInputMethod() === $method;
     }
 
-    /**
-     * todos los metodos permitidos
-     *
-     * @access protected
-     * @return array
-     */
-    public function getAllMethod()
+    public function getAllMethod(): array
     {
         return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
     }
 
-    /**
-     * @access public
-     * @param string $method
-     * @return bool
-     */
-    public function isOptions($method)
+    public function isOptions(string $method): bool
     {
         return $this->getInputMethod() === $method;
     }

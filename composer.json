@@ -10,7 +10,7 @@
             "app/config.php"
         ],
         "psr-4": {
-            "Kowo\\Ilustro\\": "lib/src/",
+            "Ilustro\\": "lib/src/",
             "App\\": "app/"
         }
     },

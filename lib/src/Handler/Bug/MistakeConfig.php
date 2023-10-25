@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Bug;
+namespace Ilustro\Handler\Bug;
 
 
 class MistakeConfig {

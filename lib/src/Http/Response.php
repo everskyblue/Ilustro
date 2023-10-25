@@ -1,94 +1,56 @@
 <?php
 
-namespace Kowo\Ilustro\Http;
+namespace Ilustro\Http;
 
+use Ilustro\Wrapper\Capsule;
+use Ilustro\Http\Response\TMsgCode;
 
-use Kowo\Ilustro\Wrapper\Capsule;
-use Kowo\Ilustro\Http\Response\TMsgCode;
-
-
-class Response {
-
+class Response
+{
     use TMsgCode;
 
-    /**
-     * @var Capsule
-     */
-    protected $container;
+    protected Capsule $container;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected Request $request;
 
-    /**
-     * @var string
-     */
-    protected $status;
+    protected int $status = 0;
 
-    /**
-     * @var array
-     */
-    protected $dispatcher;
+    protected mixed $content;
 
-    /**
-     * @var string
-     */
-    protected $output_content = '';
-
-    /**
-     * @var string
-     */
-    protected $content_type = [
-        'text/html',
-        'text/xml',
-        'text/plain',
-        'text/json',
-        'application/json',
-        'application/pdf',
-        'Content-Disposition: attachment; filename=filename',
+    protected array $content_type = [
+        "text/html",
+        "text/xml",
+        "text/plain",
+        "text/json",
+        "application/json",
+        "application/pdf",
+        "Content-Disposition: attachment; filename=filename",
     ];
 
-    /**
-     * @var array
-     */
-    protected $headers = [];
+    protected array $headers = [];
 
-    /**
-     * @param Request $request
-     */
     public function __construct(Request $request, Capsule $container = null)
     {
         $this->request = $request;
         $this->container = $container;
     }
 
-    /**
-     * add header
-     * @param string $key
-     * @param string $val
-     * @return $this
-     */
-    public function withHeader($key, $val)
+    public function withHeader(string $key, string $val): self
     {
         $this->headers[$key] = $val;
         return $this;
     }
 
-    public function getHeaderLine($key)
+    public function getHeaderLine(string $key): mixed
     {
         $list = headers_list();
 
         return isset($list[$key]) ? $list[$key] : null;
     }
 
-    /**
-     * @param int $code
-     * @return $this
-     */
-    public function withStatus($code)
+    public function withStatus(int $code): self
     {
-        if(!array_key_exists($code, $this->msg_code)){
+        if (!array_key_exists($code, $this->msg_code)) {
             throw new \RuntimeException("code status not valid");
         }
 
@@ -97,146 +59,107 @@ class Response {
         return $this;
     }
 
-    public function signedCookie($name, $value, $time, array $opt = null)
+    public function withContent(mixed $content): self
+    {
+        if (is_object($content)) {
+            ob_start();
+            $content = ob_get_contents();
+            ob_clean();
+        } elseif (is_array($content)) {
+            if (isset($content["_method"])) {
+                unset($content["_method"]);
+            }
+
+            $this->withHeader("Content-Type", "text/json");
+
+            $content = json_encode($rv);
+        }
+
+        $this->content = $content;
+
+        $this->withHeader("Content-Length", strlen((string) $content));
+
+        return $this;
+    }
+
+    public function signedCookie(string $name, string $value, int $time, array $opt = null)
     {
         setcookie($name, $value, $time, $opt);
     }
 
-    public function getStatusMsgHeader()
+    public function getStatusMsgHeader(): string
     {
-        return $this->status .' '. $this->msg_code[$this->status];
+        return $this->status . " " . $this->msg_code[$this->status];
     }
 
-    /**
-     * dispatcher function and send header
-     */
     public function send()
     {
         $request = $this->request;
 
-        $http = strtoupper($request->getProtocol()) . '/' . $request->getVersionProtocol();
+        $http =
+            strtoupper($request->getProtocol()) .
+            "/" .
+            $request->getVersionProtocol();
 
         $header = [
-            $request->getMethod() .' '. $request->getPath() .' '. $http,
-            $http .' '. $this->getStatusMsgHeader()
+            $request->getMethod() . " " . $request->getPath() . " " . $http,
+            $http . " " . $this->getStatusMsgHeader(),
         ];
 
-        if (!isset($this->headers['Content-Type'])) {
-            $this->withHeader('Content-Type', 'text/html');
-        }
-
-        if ($this->dispatcher) {
-            list($route, $action, $params) = $this->dispatcher;
-            $this->setContentView($route->invokeAction($action, $params, $this->container));
+        if (!isset($this->headers["Content-Type"])) {
+            $this->withHeader("Content-Type", "text/html");
         }
 
         if (count($this->headers) > 0) {
-            foreach($this->headers as $type => $value) {
-                $header[] = $type .':'. $value;
+            foreach ($this->headers as $type => $value) {
+                $header[] = $type . ":" . $value;
             }
         }
 
-        $this->toHeader($header);
-
-        $this->outputContent();
+        $this->sendHeaders($header)->sendContent();
     }
 
     /**
      * @param array $header
      */
-    private function toHeader(array $header)
+    private function sendHeaders(array $header): self
     {
         if (!headers_sent()) {
-            foreach($header as $send_header) {
+            foreach ($header as $send_header) {
                 header($send_header);
             }
         }
-    }
-
-    /**
-     * @param mixed $rv
-     */
-    public function setContentView($rv): self
-    {
-        if (is_object($rv)) {
-            ob_start();
-            $content = ob_get_contents();
-            ob_clean();
-        } elseif (is_array($rv)) {
-            if (isset($rv['_method'])) unset($rv['_method']);
-
-            $this->withHeader('Content-Type', 'text/json');
-
-            $content = json_encode($rv);
-        } else {
-            $content = $rv;
-        }
-
-        $this->output_content = $content;
-
-        $this->withHeader('Content-Length', strlen((string)$content));
-
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isSuccess()
+    public function isSuccess(): bool
     {
         return $this->status >= 200 && $this->status <= 207;
     }
 
-    /**
-     * redirect url before
-     * @param int $code
-     * @return $this
-     */
-    public function back($code = 301)
+    public function back(int $code = 301): self
     {
-        $this->withStatus($code);
-
-        $this->withHeader('Location', $this->request->getHeader('REFERER'));
-
-        return $this;
+        return $this->withStatus($code)->withHeader("Location", $this->request->getHeader("REFERER"));
     }
 
-    /**
-     * @param string $redirect
-     * @return $this
-     */
-    public function redirect($redirect)
+    public function redirect(string $redirect): self
     {
-        if($this->status == null) $this->withStatus(307);
-        $this->withHeader('Location', $redirect);
-        return $this;
+        if ($this->status == null) {
+            $this->withStatus(307);
+        }
+        return $this->withHeader("Location", $redirect);
     }
 
-    protected function outputContent()
+    protected function sendContent()
     {
-        if (!empty($this->output_content)) {
+        if (!empty($this->content)) {
             $open = fopen("php://output", "w");
-            fputs($open, $this->output_content);
+            fputs($open, $this->content);
             fclose($open);
         }
     }
 
-    /**
-     * @param string|callable $func
-     * @param array $params
-     * @param int $status
-     */
-    public function setDispatcher($route, $func, $params, $status)
-    {
-        $this->dispatcher = [$route, $func, $params];
-
-        return $this->withStatus($status);
-    }
-
-    /**
-     * @return array
-     */
-    public function getWithHeaders()
+    public function getWithHeaders(): array
     {
         return $this->headers;
     }

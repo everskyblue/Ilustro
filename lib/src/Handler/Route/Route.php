@@ -1,64 +1,49 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Route;
+namespace Ilustro\Handler\Route;
 
+use ReflectionClass;
+use ReflectionFunction;
 
-class Route {
+class Route
+{
+    /**
+     * @var string
+     */
+    const NAMESPACE_CONTROLLER = "App\Controllers\\";
+
+    protected string $rgxParams = "/{(.*?)}/i";
+
+    protected string $upper = "([A-Z]+)?";
+
+    protected string $lower = "([a-z]+)?";
+
+    protected string $number = "([0-9]+)?";
+
+    protected string $string = "([a-zA-Z]+)?";
+
+    protected string $all = "([a-zA-Z0-9_\-\:]+)"; // ([a-zA-Z0-9_\-\:]+)?
+
+    protected array $registerRoutes = [];
+
+    protected array $nameParameters = [];
+    
+    protected array $middlewares = [];
 
     /**
      * @var string
      */
-    protected $namespace_controller = 'App\Controllers\\';
+    protected $group;
 
-    /**
-     * @string rgxParams
-     */
-    protected $rgxParams = '/{(.*?)}/i';
-
-    /**
-     * @var string regex
-     */
-    protected $upper = '([A-Z]+)?';
-
-    /**
-     * @var string regex
-     */
-    protected $lower = '([a-z]+)?';
-
-    /**
-     * @var string regex
-     */
-    protected $number = '([0-9]+)?';
-
-    /**
-     * @var string regex
-     */
-    protected $string = '([a-zA-Z]+)?';
-
-    /**
-     * @var string regex
-     */
-    protected $all = '([a-zA-Z0-9_\-\:]+)'; // ([a-zA-Z0-9_\-\:]+)?
-
-    /**
-     * @var array
-     */
-    protected $registerRoutes = [];
-
-    /**
-     * @var array
-     */
-    protected $nameParameters = [];
-
-    /**
-     * @var string
-     */
-    protected $group = '';
+    protected string $name;
+    protected string $url;
+    protected string $method;
+    protected mixed $action;
 
     /**
      * @var string rgx
      */
-    protected $rgxSensitive = '/(string|lower|upper|number)/i';
+    protected $rgxSensitive = "/(string|lower|upper|number)/i";
 
     /**
      * @var string $nsc
@@ -70,6 +55,24 @@ class Route {
         return $this;
     }
 
+    public function addName(string $name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+    
+    public function setMiddleware(string $mdw)
+    {
+        if (!in_array($mdw, $this->middlewares))
+            array_push($this->middlewares, $mdw);
+        return $this;
+    }
+    
+    public function getMiddlewares(): array
+    {
+        return $this->middlewares;
+    }
+
     /**
      * @var string $uri
      * @var callable $c
@@ -79,6 +82,8 @@ class Route {
         $this->group = $uri;
 
         call_user_func($c, $this);
+        
+        return $this;
     }
 
     /**
@@ -89,7 +94,7 @@ class Route {
      */
     public function map(array $via, $url, $callback)
     {
-        $this->registerActions(implode(',', $via), $url, $callback);
+        $this->registerActions(implode(",", $via), $url, $callback);
 
         return $this;
     }
@@ -101,7 +106,7 @@ class Route {
      */
     public function get($url, $callback)
     {
-        return $this->registerActions('GET', $url, $callback);
+        return $this->registerActions("GET", $url, $callback);
     }
 
     /**
@@ -111,7 +116,7 @@ class Route {
      */
     public function post($url, $callback)
     {
-        return $this->registerActions('POST', $url, $callback);
+        return $this->registerActions("POST", $url, $callback);
     }
 
     /**
@@ -121,7 +126,7 @@ class Route {
      */
     public function put($url, $c)
     {
-        return $this->registerActions('PUT', $url, $c);
+        return $this->registerActions("PUT", $url, $c);
     }
 
     /**
@@ -131,7 +136,7 @@ class Route {
      */
     public function patch($url, $c)
     {
-        return $this->registerActions('PATCH', $url, $c);
+        return $this->registerActions("PATCH", $url, $c);
     }
 
     /**
@@ -141,7 +146,7 @@ class Route {
      */
     public function delete($url, $c)
     {
-        return $this->registerActions('DELETE', $url, $c);
+        return $this->registerActions("DELETE", $url, $c);
     }
 
     /**
@@ -152,12 +157,18 @@ class Route {
      */
     private function registerActions($via, $url, $exec)
     {
-        $url = empty($this->group) ? $this->resolveParameterUrl($url) : $this->group . $this->resolveParameterUrl($url);
+        $url = empty($this->group)
+            ? $this->resolveParameterUrl($url)
+            : $this->group . $this->resolveParameterUrl($url);
+
+        $this->url = $url;
+        $this->method = $via;
+        $this->action = $exec;
 
         $this->registerRoutes[] = [
-            'method' => $via,
-            'url'    => $url,
-            'action' => $exec
+            "method" => $via,
+            "url" => $url,
+            "action" => $exec,
         ];
 
         return $this;
@@ -169,54 +180,57 @@ class Route {
      */
     private function resolveParameterUrl($url)
     {
-        if(preg_match_all($this->rgxParams, $url, $matches) > 0) {
+        if (preg_match_all($this->rgxParams, $url, $matches) > 0) {
             foreach ($matches[1] as $index => $params) {
-                if (strpos($params, ':') !== false) {
-                    list($name, $type) = explode(':', $params, 2);
+                if (strpos($params, ":") !== false) {
+                    list($name, $type) = explode(":", $params, 2);
                     $this->nameParameters[] = $name;
                     if (preg_match($this->rgxSensitive, $type) > 0) {
-                        $url = str_replace($matches[0][$index], $this->{$type}, $url);
-                    }else {
-                        throw new \Exception("sensitive type no exists {$type}");
+                        $url = str_replace(
+                            $matches[0][$index],
+                            $this->{$type},
+                            $url
+                        );
+                    } else {
+                        throw new \Exception(
+                            "sensitive type no exists {$type}"
+                        );
                     }
-                }else {
+                } else {
                     $url = str_replace($matches[0][$index], $this->all, $url);
                 }
             }
         }
-        return preg_replace('/[\/|\=]/', '\\\\$0', $url).'/?';
+        return preg_replace("/[\/|\=]/", '\\\\$0', $url) . "/?";
     }
 
-    /**
-     * @return array
-     */
     public function getRegisterRoutes()
     {
         return $this->registerRoutes;
     }
 
-    /**
-     * @param string $str
-     * @param $container
-     * @return array
-     */
-    public function invokeAction($str, $params, $container = null)
+    public static function __callStatic(string $name, array $params)
     {
-        if (is_callable($str)) {
-            array_push($params, $container);
-            return call_user_func_array($str, $params);
-        }
+        return call_user_func_array([new Route(), substr($name, 1)], $params);
+    }
 
-        list($nameclass, $method) = explode('@', $str, 2);
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
-        $nameclass = $this->namespace_controller . $nameclass;
-        
-        $reflection = new \ReflectionClass($nameclass);
+    public function getMethod()
+    {
+        return $this->method;
+    }
 
-        if(!$reflection->isInstantiable()){
-            throw new \LogicException("class not instance {$reflection->getName()}");
-        }
+    public function getName()
+    {
+        return $this->name;
+    }
 
-        return call_user_func_array([$reflection->newInstance($container), $method], $params);
+    public function getAction()
+    {
+        return $this->action;
     }
 }

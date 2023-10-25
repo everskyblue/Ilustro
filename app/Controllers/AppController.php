@@ -2,15 +2,16 @@
 
 namespace App\Controllers;
 
+use Ilustro\Wrapper\Capsule;
 
 abstract class AppController
 {
     protected $container;
     
     /**
-     * @param \Kowo\Ilustro\Wrapper\Capsule $container
+     * @param $container
      */
-    public function __construct($container)
+    public function __construct(Capsule $container)
     {
         $this->container = $container;
     }
@@ -19,7 +20,7 @@ abstract class AppController
      * @param string $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->container->{$key};
     }

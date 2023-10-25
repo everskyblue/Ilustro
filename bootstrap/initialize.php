@@ -1,8 +1,8 @@
 <?php
 
-use Kowo\Ilustro\Ilustro;
-use Kowo\Ilustro\Handler\Bug\Mistake;
-use Kowo\Ilustro\Handler\Bug\MistakeConfig;
+use Ilustro\Ilustro;
+use Ilustro\Handler\Bug\Mistake;
+use Ilustro\Handler\Bug\MistakeConfig;
 
 $app = Ilustro::create(new Mistake(new MistakeConfig()));
 

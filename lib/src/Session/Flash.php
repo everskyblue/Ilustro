@@ -1,8 +1,8 @@
 <?php
 
-namespace Kowo\Ilustro\Session;
+namespace Ilustro\Session;
 
-use Kowo\Ilustro\Session\Session;
+use Ilustro\Session\Session;
 
 class Flash
 {

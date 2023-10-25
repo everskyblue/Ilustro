@@ -1,93 +1,109 @@
 <?php
 
-namespace Kowo\Ilustro\Handler\Route;
+namespace Ilustro\Handler\Route;
 
-
-use Kowo\Ilustro\Http\Url\Component as ComponentUrl;
-
+use config;
+use Exception;
+use Ilustro\Http\Url\Component as ComponentUrl;
+use Ilustro\Wrapper\Capsule;
+use Ilustro\Http\{Response, Request};
+use Ilustro\Handler\Router;
 
 class Dispatcher
 {
-    /**
-     * @var \Kowo\Ilustro\Handler\Route
-     */
-    protected $route;
+    protected Router $route;
 
-    /**
-     * @var \Kowo\Ilustro\Http\Request
-     */
-    protected $request;
+    protected Request $request;
 
-    /**
-     * @var \Kowo\Ilustro\Http\Response
-     */
-    protected $response;
+    protected Response $response;
 
-    /**
-     * @var ComponentUrl
-     */
-    protected $url;
+    protected ComponentUrl $url;
 
-    /**
-     * @var \Kowo\Ilustro\Wrapper\Capsule
-     */
-    protected $container;
+    protected Capsule $container;
 
-    /**
-     * constructor
-     * @param \Kowo\Ilustro\Handler\Route\Container $container
-     */
-    public function __construct($container)
+    public function __construct(Capsule $container)
     {
-        $this->route = (is_string($container->route)&&$container->route == 'Kowo\Ilustro\Handler\Route\StackRoute')
-            ? forward_static_call($container->route . '::getRoute')
-            : $container->route;
+        $this->route =
+            is_string($container->route) &&
+            $container->route == "Ilustro\Handler\Route\StackRoute"
+                ? forward_static_call($container->route . "::getRoute")
+                : $container->route;
         $this->container = $container;
         $this->request = $container->request;
         $this->response = $container->response;
         $this->url = new ComponentUrl($container->request->getPath());
     }
-
-    /*protected function resolveAction($c)
+    
+    protected function revision(array $mdws): mixed
     {
-        return (is_string($c)
-                 ? $this->route->resolveClass($c, $this->container)
-                 : $c
-        );
-    }*/
+        if (empty($mdws)) return true;
+        $currentMiddleware = array_shift($mdws);
+        if (!class_exists($currentMiddleware)) throw new Exception("no es una clase");;
+        return $currentMiddleware::handle($this->request, function (bool $passed) use($mdws) {
+            if (!$passed){
+                throw new Exception("middleware error");
+            } else {
+                $this->revision($mdws);
+            }
+            return true;
+        });
+    }
 
     /**
-     * @param callable|null $f
      * @throws \Exception
      */
     public function send(callable $f = null)
     {
-        foreach ($this->route->getRegisterRoutes() as $index => $arr) {
-            if ($m = $this->matchUrl($arr['url'])) {
+        foreach ($this->route->getRegisterRoutes() as $route) {
+            if ($m = $this->matchUrl($route->getUrl())) {
                 array_shift($m);
-                if ($this->request->compareMethod($arr['method'])) {
-                    $this->response->setDispatcher($this->route, $arr['action'], $m, 200);
-                } else {
-                    throw new \Exception(sprintf('method %s not issued by this url', $arr['method']));
+                if (!$this->request->compareMethod($route->getMethod())) {
+                    throw new \Exception(
+                        sprintf(
+                            "method %s not issued by this url",
+                            $route->getMethod()
+                        )
+                    );
+                    
                 }
+                $this->revision($route->getMiddlewares());
+                $this->actionController($route->getAction(), $m);
                 break;
             }
         }
 
         if (!$this->response->isSuccess()) {
-            $this->response->setDispatcher($this->route, $f, [], 404);
+            if (
+                config("app.fs_route") &&
+                ($file = FileSystemRoute::match(
+                    config("app.path_pages"),
+                    $this->url->getPath()
+                ))
+            ) {
+                $handler = require_once $file;
+                $this->actionController($handler);
+            } else {
+                $this->actionController($f, [], 404);
+            }
         }
 
         $this->response->send();
-        //$this->container->firware($this->request, $this->response);
     }
 
-    /**
-     * @param string $url
-     * @return bool|array
-     */
-    public function matchUrl($url)
+    private function actionController(
+        mixed $handler,
+        array $params = [],
+        int $status = 200
+    ) {
+        $this->response->withStatus($status)->withContent(
+            $this->route->invokeAction($handler, $params)
+        );
+    }
+
+    public function matchUrl(string $url): bool | array
     {
-        return preg_match('@^' . $url . '$@', $this->url->getPath(), $m) === 0 ? false : $m;
+        return preg_match("@^" . $url . '$@', $this->url->getPath(), $m) === 0
+            ? false
+            : $m;
     }
 }

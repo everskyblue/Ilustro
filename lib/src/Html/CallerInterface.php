@@ -1,6 +1,6 @@
 <?php
 
-namespace Kowo\Ilustro\Html;
+namespace Ilustro\Html;
 
 interface CallerInterface {
     
